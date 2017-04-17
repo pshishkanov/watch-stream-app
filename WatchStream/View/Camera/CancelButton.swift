@@ -9,12 +9,12 @@
 import Foundation
 import UIKit
 
-class CancelButton: UIButton {
+@IBDesignable class CancelButton: UIButton {
     
     // MARK: On tap observer
     private var onTapObservers = [() -> Void]()
     
-    @objc private func onTapNotify() {
+    func onTapNotify() {        
         onTapObservers.forEach({ $0() })
     }
     

@@ -43,13 +43,6 @@ class CameraViewController: UIViewController {
     var isSquare = false
     var layerAnimation = CABasicAnimation(keyPath: "path")
     
-    private let motionManager: CMMotionManager = {
-        let motionManager = CMMotionManager()
-        motionManager.accelerometerUpdateInterval = 0.5
-        motionManager.gyroUpdateInterval = 0.5
-        return motionManager
-    }()
-    
     override open func viewDidLoad() {
         super.viewDidLoad()
         setPosition()
@@ -67,33 +60,10 @@ class CameraViewController: UIViewController {
 //        if !self.captureSession.isRunning {
 //            self.captureSession.startRunning()
 //        }
-        
-        if !self.motionManager.isAccelerometerActive {
-            self.motionManager.startAccelerometerUpdates(to: OperationQueue.current!, withHandler: { accelerometerData, error in
-                if error == nil {
-                    let currentOrientation = accelerometerData!.acceleration.toDeviceOrientation() ?? self.currentOrientation
-                    if self.originalOrientation == nil {
-                        self.initialOriginalOrientationForOrientation()
-                        self.currentOrientation = self.originalOrientation
-                    }
-                    if let currentOrientation = currentOrientation , self.currentOrientation != currentOrientation {
-                        self.currentOrientation = currentOrientation
-                        self.updateContentLayoutForCurrentOrientation()
-                    }
-                } else {
-                    print("error while update accelerometer: \(error!.localizedDescription)", terminator: "")
-                }
-            })
-        }
-
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-//        if self.originalOrientation == nil {
-//            self.contentLayer.frame = self.view.bounds
-//            self.previewLayer.frame = self.view.bounds
-//        }
     }
 
     open func setupDevices() {
@@ -120,8 +90,8 @@ class CameraViewController: UIViewController {
     
     open func setPosition() {
         let cameraView = CameraView(frame: view.frame)
-       
-        view.addSubview(cameraView)
+        self.cameraView = cameraView
+//        view.addSubview(cameraView)
         /*
         self.view.backgroundColor = UIColor.black
         self.view.addSubview(self.contentLayer)
@@ -221,30 +191,6 @@ class CameraViewController: UIViewController {
     open override var shouldAutorotate : Bool {
         return false
     }
-    
-    open func initialOriginalOrientationForOrientation() {
-        self.originalOrientation = UIApplication.shared.statusBarOrientation.toDeviceOrientation()
-        if let connection = self.previewLayer.connection {
-            connection.videoOrientation = self.originalOrientation.toAVCaptureVideoOrientation()
-        }
-    }
-    
-    open func updateContentLayoutForCurrentOrientation() {
-        let newAngle = self.currentOrientation.toAngleRelativeToPortrait() - self.originalOrientation.toAngleRelativeToPortrait()
-        
-        var allowsRotate = false
-        if allowsRotate {
-            
-        } else {
-            let rotateAffineTransform = CGAffineTransform.identity.rotated(by: newAngle)
-            
-            UIView.animate(withDuration: 0.2, animations: {
-                self.switchButton.transform = rotateAffineTransform
-                self.cancelButton.transform = rotateAffineTransform
-            })
-        }
-    }
-    
 }
 
 public extension UIInterfaceOrientation {

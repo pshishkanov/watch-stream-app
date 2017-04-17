@@ -17,4 +17,13 @@ class Images {
     class func cameraCancelImage() -> UIImage {
         return UIImage(named: "camera-cancel-icon")!
     }
+    
+    class func cameraFrontSampleImage() -> UIImage {
+        return UIImage(named: "camera-front-sample")!
+    }
+    
+    class func cameraRareSampleImage() -> UIImage {
+        return UIImage(named: "camera-rare-sample")!
+    }
+
 }

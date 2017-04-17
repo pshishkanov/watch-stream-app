@@ -69,17 +69,14 @@ class CameraView: UIView {
         return button
     }()
     
-    let switchButton: UIButton = {
-        let button = UIButton()
-        button.setImage(Images.cameraSwitchImage(), for: .normal)
-        button.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
-        button.sizeToFit()
-        return button
-    }()
-    
     let cancelButton: CancelButton = {
         let button = CancelButton()       
         return button
+    }()
+    
+    let previewView: PreviewView = {
+        let view = PreviewView()
+        return view
     }()
     
     // MARK: Constructor
@@ -90,6 +87,9 @@ class CameraView: UIView {
     }
     
     func positionSubview() {
+        previewView.frame = frame
+        addSubview(previewView)
+        
         controlsView.frame = frame
         addSubview(controlsView)
         
@@ -102,11 +102,6 @@ class CameraView: UIView {
         cameraButton.center = CGPoint(x: bottomView.bounds.width / 2, y: bottomView.bounds.height / 2)
         bottomView.addSubview(cameraButton)
         
-        let switchButtonCenterX = (bottomView.bounds.width / 2 - cameraButton.bounds.width / 2) / 2
-        let switchButtonCenterY = bottomView.bounds.height / 2
-        switchButton.center = CGPoint(x: switchButtonCenterX, y: switchButtonCenterY)
-        bottomView.addSubview(switchButton)
-        
         let cancelButtonCenterX = bottomView.bounds.width / 2 + (bottomView.bounds.width / 2 + cameraButton.bounds.width / 2) / 2
         let cancelButtonCenterY = bottomView.bounds.height / 2
         cancelButton.center = CGPoint(x: cancelButtonCenterX, y: cancelButtonCenterY)
@@ -114,6 +109,7 @@ class CameraView: UIView {
     }
     
     func addObservers() {
+        
         cameraButton.addOnTurnOnObserver {
             self.onStartStreamingNotify()
         }
@@ -128,16 +124,10 @@ class CameraView: UIView {
         }
         cancelButton.addOnTapObserver {
             self.onCancelStreamingNotify()
-        }
-    }
-    
-    func changedDeviceOrientation() {
-        
+        }        
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
-    
-    
 }

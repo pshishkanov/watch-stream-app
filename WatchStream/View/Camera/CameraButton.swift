@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CameraButton: UIButton {
+@IBDesignable class CameraButton: UIButton {
     
     // MARK: On turn on observer
     private var onTurnOnObservers = [() -> Void]()
@@ -33,12 +33,20 @@ class CameraButton: UIButton {
     }
     
     // MARK: Size
-    struct Dimensions {
-        static let radius = 40
-        static let borderLayerRadius = 32
-        static let buttonLayerRadius = 30
-        static let maskLayerRadius = 27
+    @IBInspectable var diameter: Int = 0 {
+        didSet {
+            radius = Double(diameter / 2)
+            borderLayerRadius = radius * 0.8
+            buttonLayerRadius = radius * 0.75
+            maskLayerRadius = radius * 0.7
+            setupLayers()
+        }
     }
+    
+    private var radius: Double = 0
+    private var borderLayerRadius: Double = 0
+    private var buttonLayerRadius: Double = 0
+    private var maskLayerRadius: Double = 0
     
     private var isCapture: Bool = false {
         didSet {
@@ -49,40 +57,10 @@ class CameraButton: UIButton {
 
             }
         }
-    }
+    }   
     
-    private let borderLayer: CAShapeLayer = {
-        let layer = CAShapeLayer()
-        layer.path = UIBezierPath(arcCenter: CGPoint(x: Dimensions.radius, y: Dimensions.radius),
-                                  radius: CGFloat(Dimensions.borderLayerRadius),
-                                  startAngle: 0, endAngle: CGFloat(2 * Double.pi),
-                                  clockwise: true).cgPath
-        layer.fillColor = UIColor.clear.cgColor
-        layer.strokeColor = UIColor.white.cgColor
-        layer.lineWidth = 6
-        return layer
-    }()
-    
-    private let buttonLayer: CAShapeLayer = {
-        let layer = CAShapeLayer()
-        layer.path = UIBezierPath(roundedRect: CGRect(x: Dimensions.radius - Dimensions.buttonLayerRadius,
-                                                      y: Dimensions.radius - Dimensions.buttonLayerRadius,
-                                                      width: 2 * Dimensions.buttonLayerRadius,
-                                                      height: 2 * Dimensions.buttonLayerRadius),
-                                  cornerRadius: 6).cgPath
-        
-        layer.fillColor = UIColor.red.cgColor
-        
-        let maskLayer = CAShapeLayer()
-        maskLayer.path = UIBezierPath(roundedRect: CGRect(x: Dimensions.radius - Dimensions.maskLayerRadius,
-                                                          y: Dimensions.radius - Dimensions.maskLayerRadius,
-                                                          width: 2 * Dimensions.maskLayerRadius,
-                                                          height: 2 * Dimensions.maskLayerRadius),
-                                      cornerRadius: CGFloat(Dimensions.radius)).cgPath
-        layer.mask = maskLayer
-        
-        return layer
-    }()
+    private var borderLayer: CAShapeLayer = CAShapeLayer()
+    private var buttonLayer: CAShapeLayer = CAShapeLayer()
     
     private let animation: CABasicAnimation = {
         let animation = CABasicAnimation(keyPath: "path")
@@ -93,30 +71,68 @@ class CameraButton: UIButton {
         return animation
     }()
     
-    init() {
-        super.init(frame: CGRect(x: 0, y: 0, width: 2 * Dimensions.radius, height: 2 * Dimensions.radius))
-       
-        layer.addSublayer(borderLayer)
-        layer.addSublayer(buttonLayer)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupLayers()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupLayers()
+    }
+    
+    private func setupLayers() {
+        setupBorderLayer()
+        setupButtonLayer()
         
         addTarget(self, action: #selector(touchDown as (Void) -> Void), for: .touchDown)
         addTarget(self, action: #selector(touchUpInside as (Void) -> Void), for: .touchUpInside)
         addTarget(self, action: #selector(touchUpOutside as (Void) -> Void), for: .touchUpOutside)
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+    private func setupBorderLayer() {
+        let layer = self.borderLayer
+        layer.path = UIBezierPath(arcCenter: CGPoint(x: radius, y: radius),
+                                        radius: CGFloat(borderLayerRadius),
+                                        startAngle: 0, endAngle: CGFloat(2 * Double.pi),
+                                        clockwise: true).cgPath
+        layer.fillColor = UIColor.clear.cgColor
+        layer.strokeColor = UIColor.white.cgColor
+        layer.lineWidth = 6
+        
+        self.layer.addSublayer(layer)
+    }
+    
+    private func setupButtonLayer() {
+        let layer = self.buttonLayer
+        layer.path = UIBezierPath(roundedRect: CGRect(x: radius - buttonLayerRadius,
+                                                            y: radius - buttonLayerRadius,
+                                                            width: 2 * buttonLayerRadius,
+                                                            height: 2 * buttonLayerRadius),
+                                        cornerRadius: 6).cgPath
+        
+        layer.fillColor = UIColor.red.cgColor
+        
+        let maskLayer = CAShapeLayer()
+        maskLayer.path = UIBezierPath(roundedRect: CGRect(x: radius - maskLayerRadius,
+                                                          y: radius - maskLayerRadius,
+                                                          width: 2 * maskLayerRadius,
+                                                          height: 2 * maskLayerRadius),
+                                      cornerRadius: CGFloat(radius)).cgPath
+        layer.mask = maskLayer
+        
+        self.layer.addSublayer(layer)
     }
     
     internal func touchUpInside() {
         buttonLayer.opacity = 1
 
         if isCapture {
-            animation.fromValue = innerPath(offset: 25).cgPath
-            animation.toValue = innerPath(offset: 10).cgPath
+            animation.fromValue = innerPath(offset: radius / 1.7).cgPath
+            animation.toValue = innerPath(offset: radius / 5).cgPath
         } else {
-            animation.fromValue = innerPath(offset: 10).cgPath
-            animation.toValue = innerPath(offset: 25).cgPath
+            animation.fromValue = innerPath(offset: radius / 5).cgPath
+            animation.toValue = innerPath(offset: radius / 1.7).cgPath
         }
         buttonLayer.add(animation, forKey: "path");
         
@@ -131,7 +147,7 @@ class CameraButton: UIButton {
         buttonLayer.opacity = 0.5
     }
     
-    internal func innerPath(offset: Int) -> UIBezierPath {
+    internal func innerPath(offset: Double) -> UIBezierPath {
         return UIBezierPath(roundedRect: bounds.insetBy(dx: CGFloat(offset), dy: CGFloat(offset)), cornerRadius: 6)
     }
 }
