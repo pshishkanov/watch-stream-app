@@ -14,7 +14,7 @@ import UIKit
     // MARK: On tap observer
     private var onTapObservers = [() -> Void]()
     
-    func onTapNotify() {        
+    func onTapNotify() {
         onTapObservers.forEach({ $0() })
     }
     
@@ -24,13 +24,18 @@ import UIKit
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setTitle( "Cancel" , for: .normal )
-        autoresizingMask = [.flexibleBottomMargin, .flexibleLeftMargin]
+        setupButton()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupButton()
+    }
+    
+    private func setupButton() {
+        setTitle( "Cancel" , for: .normal )        
         sizeToFit()
         addTarget(self, action: #selector(onTapNotify), for: .touchUpInside)
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
 }

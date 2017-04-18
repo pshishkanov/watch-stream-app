@@ -21,36 +21,17 @@ class CameraViewController: UIViewController {
     private var captureDeviceFront: AVCaptureDevice?
     private var captureDeviceBack: AVCaptureDevice?
     
-    private var originalOrientation: UIDeviceOrientation!
-    private var currentOrientation: UIDeviceOrientation!
     
-    private let contentLayer = UIView()
-    private let bottomLayer = UIView()
-    
-    private var switchButton: UIButton!
-    private var cancelButton: UIButton!
-    private var recordButton: CameraButton!
-    private var borderLayer: CALayer!
-    private var buttonLayer: CALayer!
-
-    private var borderView: CALayer!
-    private var buttonView: CALayer!
-    
-    private var cameraView: CameraView?
-
-    let maskLayer = CAShapeLayer()
-    
-    var isSquare = false
-    var layerAnimation = CABasicAnimation(keyPath: "path")
+    @IBOutlet var cameraView: CameraView!
     
     override open func viewDidLoad() {
         super.viewDidLoad()
-        setPosition()
+        cameraView.setupObservers()
         addObservers()
     }
     
     func addObservers() {
-        cameraView?.addOnCancelStreamingObserver {
+        cameraView.addOnCancelStreamingObserver {
             self.dismiss(animated: true, completion: nil)
         }
     }
@@ -86,66 +67,6 @@ class CameraViewController: UIViewController {
         default:
             self.currentDevice = self.captureDeviceBack
         }
-    }
-    
-    open func setPosition() {
-        let cameraView = CameraView(frame: view.frame)
-        self.cameraView = cameraView
-//        view.addSubview(cameraView)
-        /*
-        self.view.backgroundColor = UIColor.black
-        self.view.addSubview(self.contentLayer)
-        self.contentLayer.backgroundColor = UIColor.clear
-        self.contentLayer.frame = self.view.bounds
-        
-        let bottomViewHeight: Int = 80
-        bottomLayer.bounds.size = CGSize(width: contentLayer.bounds.width, height: CGFloat(bottomViewHeight))
-        bottomLayer.frame.origin = CGPoint(x: 0, y: contentLayer.bounds.height - CGFloat(bottomViewHeight))
-        bottomLayer.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
-        bottomLayer.backgroundColor = UIColor(white: 0, alpha: 0.4)
-        contentLayer.addSubview(bottomLayer)
-        
-        // switch button
-        let cameraSwitchButton: UIButton = {
-            let cameraSwitchButton = UIButton()
-            cameraSwitchButton.addTarget(self, action: #selector(CameraViewController.switchCamera), for: .touchUpInside)
-            cameraSwitchButton.setImage(Images.cameraSwitchImage(), for: .normal)
-            cameraSwitchButton.sizeToFit()
-            
-            return cameraSwitchButton
-        }()
-        
-        cameraSwitchButton.frame.origin = CGPoint(x: cameraSwitchButton.bounds.width - 15, y: (bottomLayer.bounds.height - cameraSwitchButton.bounds.height) / 2)
-        cameraSwitchButton.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
-        bottomLayer.addSubview(cameraSwitchButton)
-        self.switchButton = cameraSwitchButton
-        
-        let recordButton: CameraButton = CameraButton()
-        let center = CGPoint(x: bottomLayer.bounds.width / 2, y: bottomLayer.bounds.height / 2)
-        recordButton.center = center
-        
-        self.recordButton = recordButton
-        
-        func start() {
-            print("Start")
-        }
-        self.recordButton.didStartStreaming = start
-        bottomLayer.addSubview(recordButton)
-        
-        let cancelButton: UIButton = {
-            let cancelButton = UIButton()
-            cancelButton.addTarget(self, action: #selector(dismiss as (Void) -> Void), for: .touchUpInside)
-            cancelButton.setTitle( "Cancel" , for: .normal )
-            cancelButton.sizeToFit()
-            
-            return cancelButton
-        }()
-        self.cancelButton = cancelButton
-        
-        cancelButton.frame.origin = CGPoint(x: bottomLayer.bounds.width - cameraSwitchButton.bounds.width - 35, y: (bottomLayer.bounds.height - cameraSwitchButton.bounds.height) / 2 + 5)
-        cancelButton.autoresizingMask = [.flexibleBottomMargin, .flexibleLeftMargin]
-        bottomLayer.addSubview(cancelButton)
- */
     }
     
     open func beginSession() {

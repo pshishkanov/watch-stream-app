@@ -57,6 +57,10 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2uA-Rd-eOi" customClass="PreviewView" customModule="WatchStream" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
                             <view alpha="0.40000000000000002" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="liv-Xv-5mu">
                                 <rect key="frame" x="0.0" y="380" width="320" height="100"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -88,31 +92,40 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Ls-zX-DOA">
-                                <rect key="frame" x="241" y="415" width="48" height="30"/>
-                                <state key="normal" title="Cancel">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Ls-zX-DOA" customClass="CancelButton" customModule="WatchStream" customModuleProvider="target">
+                                <rect key="frame" x="259" y="413.5" width="30" height="33"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <state key="normal">
                                     <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" red="0.26390811089999999" green="1" blue="0.26998663969999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="2uA-Rd-eOi" secondAttribute="trailing" id="3NB-r2-YOY"/>
+                            <constraint firstAttribute="bottom" secondItem="2uA-Rd-eOi" secondAttribute="bottom" id="3qs-XC-nGS"/>
                             <constraint firstItem="Xm5-ha-Hiv" firstAttribute="centerX" secondItem="liv-Xv-5mu" secondAttribute="centerX" id="AhR-j5-T8L"/>
                             <constraint firstAttribute="trailingMargin" secondItem="6Ls-zX-DOA" secondAttribute="trailing" constant="15" id="Vng-3e-WFy"/>
+                            <constraint firstItem="liv-Xv-5mu" firstAttribute="bottom" secondItem="wfy-db-euE" secondAttribute="top" id="YM6-WS-TOO"/>
+                            <constraint firstItem="2uA-Rd-eOi" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="Yb6-Vb-up2"/>
                             <constraint firstItem="liv-Xv-5mu" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="by7-sD-UeR"/>
-                            <constraint firstItem="liv-Xv-5mu" firstAttribute="bottom" secondItem="wfy-db-euE" secondAttribute="top" id="dqe-Xp-fD1"/>
                             <constraint firstItem="Xm5-ha-Hiv" firstAttribute="centerY" secondItem="liv-Xv-5mu" secondAttribute="centerY" id="kCy-wf-Kve"/>
+                            <constraint firstItem="2uA-Rd-eOi" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="sIW-6U-t1X"/>
                             <constraint firstItem="liv-Xv-5mu" firstAttribute="centerY" secondItem="6Ls-zX-DOA" secondAttribute="centerY" id="t33-zv-KBP"/>
                             <constraint firstAttribute="trailing" secondItem="liv-Xv-5mu" secondAttribute="trailing" id="ylm-pf-2Yb"/>
                         </constraints>
+                        <connections>
+                            <outlet property="cameraButton" destination="Xm5-ha-Hiv" id="KcV-dj-PTc"/>
+                            <outlet property="cancelButton" destination="6Ls-zX-DOA" id="2hH-8N-9fm"/>
+                            <outlet property="previewView" destination="2uA-Rd-eOi" id="fXA-iC-QH4"/>
+                        </connections>
                     </view>
                     <connections>
-                        <outlet property="re" destination="Xm5-ha-Hiv" id="06K-F4-Pci"/>
+                        <outlet property="cameraView" destination="8bC-Xf-vdC" id="Rq9-39-5FA"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1349.5999999999999" y="97.601199400299862"/>
+            <point key="canvasLocation" x="1434" y="96"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Wu6-PN-Hdr">
@@ -130,7 +143,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pIo-tu-3L3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-150" y="98"/>
+            <point key="canvasLocation" x="-313" y="98"/>
         </scene>
     </scenes>
 </document>
