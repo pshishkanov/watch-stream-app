@@ -9,190 +9,101 @@
 import Foundation
 import UIKit
 import AVFoundation
-import CoreMotion
 
-class CameraViewController: UIViewController {
+class CameraViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     
-    private let captureSession = AVCaptureSession()
-    private var previewLayer: AVCaptureVideoPreviewLayer!
+    @IBOutlet weak var cameraButton: CameraButton!
+    @IBOutlet weak var cancelButton: CancelButton!
+    @IBOutlet weak var previewView: PreviewView!
     
-    private var defaultCaptureDevice = AVCaptureDevicePosition.back
-    private var currentDevice: AVCaptureDevice?
-    private var captureDeviceFront: AVCaptureDevice?
-    private var captureDeviceBack: AVCaptureDevice?
+    private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
     
+    private let dataOutput = AVCaptureVideoDataOutput()
+    private let queue = DispatchQueue(label: "com.invasivecode.videoQueue")
     
-    @IBOutlet var cameraView: CameraView!
+    // MARK: Capture
+    private let session = AVCaptureSession()
+    
+    private var defaultVideoDevice: AVCaptureDevice = {
+        let devices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo) as! [AVCaptureDevice]
+        return devices[0]
+    }()
+    
     
     override open func viewDidLoad() {
         super.viewDidLoad()
-        cameraView.setupObservers()
-        addObservers()
+        setupBlurView()
+        setupObservers()
+        configureSession()
     }
     
-    func addObservers() {
-        cameraView.addOnCancelStreamingObserver {
+    private func setupBlurView() {
+        blurView.frame = previewView.bounds
+        blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        self.previewView.addSubview(blurView)
+    }
+    
+    func setupObservers() {
+        cameraButton.addOnTurnOnObserver {
+            self.dataOutput.setSampleBufferDelegate(self, queue: self.queue)
+            self.cancelButton.isHidden = true
+        }
+        cameraButton.addOnTurnOffObserver {
+            self.dataOutput.setSampleBufferDelegate(nil, queue: self.queue)
+            self.cancelButton.isHidden = false
+        }
+        cancelButton.addOnTapObserver {
             self.dismiss(animated: true, completion: nil)
         }
     }
     
+    func configureSession() {
+        previewView.session = session
+        previewView.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+        
+        session.beginConfiguration()
+        session.sessionPreset = AVCaptureSessionPresetHigh
+        do {
+            let videoDeviceInput = try AVCaptureDeviceInput(device: defaultVideoDevice)
+            if (session.canAddInput(videoDeviceInput)) {
+                session.addInput(videoDeviceInput)
+                previewView.previewLayer.connection.videoOrientation = .portrait
+            }
+            dataOutput.videoSettings = [(kCVPixelBufferPixelFormatTypeKey as NSString) : NSNumber(value: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange as UInt32)]
+            dataOutput.alwaysDiscardsLateVideoFrames = true
+            if session.canAddOutput(dataOutput) {
+                session.addOutput(dataOutput)
+            }
+        } catch {
+            print("Could not add video device input to the session: \(error.localizedDescription)")
+            session.commitConfiguration()
+            return
+        }
+        session.commitConfiguration()
+        
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        if !self.captureSession.isRunning {
-//            self.captureSession.startRunning()
-//        }
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-    }
-
-    open func setupDevices() {
-        let devices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo) as! [AVCaptureDevice]
-        
-        for device in devices {
-            if device.position == .back {
-                self.captureDeviceBack = device
-            }
-            if device.position == .front {
-                self.captureDeviceFront = device
-            }
+        if !self.session.isRunning {
+            self.session.startRunning()
         }
-        
-        switch self.defaultCaptureDevice {
-        case .front:
-            self.currentDevice = self.captureDeviceFront ?? self.captureDeviceBack
-        case .back:
-            self.currentDevice = self.captureDeviceBack ?? self.captureDeviceFront
-        default:
-            self.currentDevice = self.captureDeviceBack
+        UIView.animate(withDuration: 0.3) {
+            self.blurView.effect = nil
         }
     }
     
-    open func beginSession() {
-        self.captureSession.sessionPreset = AVCaptureSessionPresetPhoto
-        
-        self.setupCurrentDevice()
-        
-        let stillImageOutput = AVCaptureStillImageOutput()
-        if self.captureSession.canAddOutput(stillImageOutput) {
-            self.captureSession.addOutput(stillImageOutput)
-        }              
-        
-        self.previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
-        self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
-        self.previewLayer.frame = self.view.bounds
-        
-        let rootLayer = self.view.layer
-        rootLayer.masksToBounds = true
-        rootLayer.insertSublayer(self.previewLayer, at: 0)
-    }
-    
-    internal func switchCamera() {
-        self.currentDevice = self.currentDevice == self.captureDeviceBack ?
-            self.captureDeviceFront : self.captureDeviceBack
-        
-        self.setupCurrentDevice()
-    }
-    
-    open func setupCurrentDevice() {
-        if let currentDevice = self.currentDevice {
-            
-            for oldInput in self.captureSession.inputs as! [AVCaptureInput] {
-                self.captureSession.removeInput(oldInput)
-            }
-            
-            let frontInput = try? AVCaptureDeviceInput(device: self.currentDevice)
-            if self.captureSession.canAddInput(frontInput) {
-                self.captureSession.addInput(frontInput)
-            }
+    override func viewWillDisappear(_ animated: Bool) {
+        if session.isRunning {
+            session.stopRunning()
         }
     }
     
-    open override var shouldAutorotate : Bool {
-        return false
-    }
-}
-
-public extension UIInterfaceOrientation {
-    
-    func toDeviceOrientation() -> UIDeviceOrientation {
-        switch self {
-        case .portrait:
-            return .portrait
-        case .portraitUpsideDown:
-            return .portraitUpsideDown
-        case .landscapeRight:
-            return .landscapeLeft
-        case .landscapeLeft:
-            return .landscapeRight
-        default:
-            return .portrait
-        }
-    }
-}
-
-public extension UIDeviceOrientation {
-    
-    func toAVCaptureVideoOrientation() -> AVCaptureVideoOrientation {
-        switch self {
-        case .portrait:
-            return .portrait
-        case .portraitUpsideDown:
-            return .portraitUpsideDown
-        case .landscapeRight:
-            return .landscapeLeft
-        case .landscapeLeft:
-            return .landscapeRight
-        default:
-            return .portrait
-        }
+    // TODO: Remove from this class
+    func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
     }
     
-    func toInterfaceOrientationMask() -> UIInterfaceOrientationMask {
-        switch self {
-        case .portrait:
-            return .portrait
-        case .portraitUpsideDown:
-            return .portraitUpsideDown
-        case .landscapeRight:
-            return .landscapeLeft
-        case .landscapeLeft:
-            return .landscapeRight
-        default:
-            return .portrait
-        }
-    }
-    
-    func toAngleRelativeToPortrait() -> CGFloat {
-        switch self {
-        case .portrait:
-            return 0
-        case .portraitUpsideDown:
-            return CGFloat(M_PI)
-        case .landscapeRight:
-            return CGFloat(-M_PI_2)
-        case .landscapeLeft:
-            return CGFloat(M_PI_2)
-        default:
-            return 0
-        }
-    }
-    
-}
-
-public extension CMAcceleration {
-    func toDeviceOrientation() -> UIDeviceOrientation? {
-        if self.x >= 0.75 {
-            return .landscapeRight
-        } else if self.x <= -0.75 {
-            return .landscapeLeft
-        } else if self.y <= -0.75 {
-            return .portrait
-        } else if self.y >= 0.75 {
-            return .portraitUpsideDown
-        } else {
-            return nil
-        }
+    // TODO: Remove from this class
+    func captureOutput(_ captureOutput: AVCaptureOutput!, didDrop sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
     }
 }

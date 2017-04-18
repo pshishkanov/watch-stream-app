@@ -36,7 +36,7 @@
                         <barButtonItem key="leftBarButtonItem" systemItem="refresh" id="QOn-rx-NjR"/>
                         <barButtonItem key="rightBarButtonItem" systemItem="camera" id="xd3-2x-wOl">
                             <connections>
-                                <segue destination="BYZ-38-t0r" kind="presentation" id="8BZ-7G-jEC"/>
+                                <segue destination="BYZ-38-t0r" kind="presentation" animates="NO" modalPresentationStyle="fullScreen" modalTransitionStyle="crossDissolve" id="8BZ-7G-jEC"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -53,7 +53,7 @@
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC" customClass="CameraView" customModule="WatchStream" customModuleProvider="target">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC" userLabel="Camera View">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
@@ -61,32 +61,20 @@
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
-                            <view alpha="0.40000000000000002" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="liv-Xv-5mu">
+                            <view alpha="0.40000000000000002" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="liv-Xv-5mu" userLabel="Bottom View">
                                 <rect key="frame" x="0.0" y="380" width="320" height="100"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="100" id="9Df-hi-RAl"/>
                                 </constraints>
                             </view>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xm5-ha-Hiv" customClass="CameraButton" customModule="WatchStream" customModuleProvider="target">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xm5-ha-Hiv" customClass="CameraButton" customModule="WatchStream">
                                 <rect key="frame" x="120.5" y="390" width="80" height="80"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="80" id="Iph-1x-Kv5"/>
                                     <constraint firstAttribute="height" constant="80" id="xnj-fP-v9T"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="radius">
-                                        <integer key="value" value="43"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="borderLayerRadius">
-                                        <integer key="value" value="38"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="buttonLayerRadius">
-                                        <integer key="value" value="40"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="maskLayerRadius">
-                                        <integer key="value" value="28"/>
-                                    </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="diameter">
                                         <integer key="value" value="80"/>
                                     </userDefinedRuntimeAttribute>
@@ -113,14 +101,11 @@
                             <constraint firstItem="liv-Xv-5mu" firstAttribute="centerY" secondItem="6Ls-zX-DOA" secondAttribute="centerY" id="t33-zv-KBP"/>
                             <constraint firstAttribute="trailing" secondItem="liv-Xv-5mu" secondAttribute="trailing" id="ylm-pf-2Yb"/>
                         </constraints>
-                        <connections>
-                            <outlet property="cameraButton" destination="Xm5-ha-Hiv" id="KcV-dj-PTc"/>
-                            <outlet property="cancelButton" destination="6Ls-zX-DOA" id="2hH-8N-9fm"/>
-                            <outlet property="previewView" destination="2uA-Rd-eOi" id="fXA-iC-QH4"/>
-                        </connections>
                     </view>
                     <connections>
-                        <outlet property="cameraView" destination="8bC-Xf-vdC" id="Rq9-39-5FA"/>
+                        <outlet property="cameraButton" destination="Xm5-ha-Hiv" id="PTB-KN-fNn"/>
+                        <outlet property="cancelButton" destination="6Ls-zX-DOA" id="x0C-gA-a8l"/>
+                        <outlet property="previewView" destination="2uA-Rd-eOi" id="E7k-Qn-zjN"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
