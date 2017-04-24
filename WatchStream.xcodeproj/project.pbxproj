@@ -24,6 +24,8 @@
 		60B38A7E1E53845F001C167D /* WatchStreamUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B38A7D1E53845F001C167D /* WatchStreamUITests.swift */; };
 		60EAC4C31E8160A30058AAC2 /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EAC4C21E8160A30058AAC2 /* CameraViewController.swift */; };
 		60FBBC141EAE336900C67DBB /* H264EncoderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60FBBC131EAE336900C67DBB /* H264EncoderDelegate.swift */; };
+		60FBBC1B1EAE710E00C67DBB /* Cartfile in Resources */ = {isa = PBXBuildFile; fileRef = 60FBBC1A1EAE710E00C67DBB /* Cartfile */; };
+		60FBBC1E1EAE724C00C67DBB /* SwiftyBeaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FBBC1D1EAE724C00C67DBB /* SwiftyBeaver.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +69,8 @@
 		60B38A7F1E53845F001C167D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		60EAC4C21E8160A30058AAC2 /* CameraViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CameraViewController.swift; path = Controller/CameraViewController.swift; sourceTree = "<group>"; };
 		60FBBC131EAE336900C67DBB /* H264EncoderDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = H264EncoderDelegate.swift; path = Coder/H264EncoderDelegate.swift; sourceTree = "<group>"; };
+		60FBBC1A1EAE710E00C67DBB /* Cartfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
+		60FBBC1D1EAE724C00C67DBB /* SwiftyBeaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyBeaver.framework; path = Carthage/Build/iOS/SwiftyBeaver.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +78,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60FBBC1E1EAE724C00C67DBB /* SwiftyBeaver.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,10 +150,12 @@
 		60B38A511E53845E001C167D = {
 			isa = PBXGroup;
 			children = (
+				60FBBC1A1EAE710E00C67DBB /* Cartfile */,
 				60B38A5C1E53845F001C167D /* WatchStream */,
 				60B38A711E53845F001C167D /* WatchStreamTests */,
 				60B38A7C1E53845F001C167D /* WatchStreamUITests */,
 				60B38A5B1E53845F001C167D /* Products */,
+				60FBBC1C1EAE724C00C67DBB /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -217,6 +224,14 @@
 			children = (
 			);
 			name = Model;
+			sourceTree = "<group>";
+		};
+		60FBBC1C1EAE724C00C67DBB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				60FBBC1D1EAE724C00C67DBB /* SwiftyBeaver.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -332,6 +347,7 @@
 			files = (
 				60B38A681E53845F001C167D /* LaunchScreen.storyboard in Resources */,
 				60B38A631E53845F001C167D /* WatchStream.storyboard in Resources */,
+				60FBBC1B1EAE710E00C67DBB /* Cartfile in Resources */,
 				600C59611E842E9100DE3197 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -522,6 +538,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = D6BD4C9FFC;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = WatchStream/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -538,6 +558,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = D6BD4C9FFC;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = WatchStream/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
