@@ -15,7 +15,6 @@
 		6041CFCA1E7BB3E3002B5721 /* UDPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6041CFC61E7BB3E3002B5721 /* UDPClient.swift */; };
 		6041CFCB1E7BB3E3002B5721 /* yudpsocket.c in Sources */ = {isa = PBXBuildFile; fileRef = 6041CFC71E7BB3E3002B5721 /* yudpsocket.c */; };
 		606A75641E7D0254007E2874 /* H264Encoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606A75631E7D0254007E2874 /* H264Encoder.swift */; };
-		606A75661E7D0265007E2874 /* H264Decoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606A75651E7D0265007E2874 /* H264Decoder.swift */; };
 		607AFC2E1E923E17007518AD /* CancelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607AFC2D1E923E17007518AD /* CancelButton.swift */; };
 		609DE2281E86CA470094AA5E /* Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = 609DE2271E86CA470094AA5E /* Images.swift */; };
 		60B38A5E1E53845F001C167D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B38A5D1E53845F001C167D /* AppDelegate.swift */; };
@@ -24,6 +23,7 @@
 		60B38A731E53845F001C167D /* WatchStreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B38A721E53845F001C167D /* WatchStreamTests.swift */; };
 		60B38A7E1E53845F001C167D /* WatchStreamUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B38A7D1E53845F001C167D /* WatchStreamUITests.swift */; };
 		60EAC4C31E8160A30058AAC2 /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EAC4C21E8160A30058AAC2 /* CameraViewController.swift */; };
+		60FBBC141EAE336900C67DBB /* H264EncoderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60FBBC131EAE336900C67DBB /* H264EncoderDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,7 +52,6 @@
 		6041CFC61E7BB3E3002B5721 /* UDPClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UDPClient.swift; path = Network/UDPClient.swift; sourceTree = "<group>"; };
 		6041CFC71E7BB3E3002B5721 /* yudpsocket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = yudpsocket.c; path = Network/yudpsocket.c; sourceTree = "<group>"; };
 		606A75631E7D0254007E2874 /* H264Encoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = H264Encoder.swift; path = Coder/H264Encoder.swift; sourceTree = "<group>"; };
-		606A75651E7D0265007E2874 /* H264Decoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = H264Decoder.swift; path = Coder/H264Decoder.swift; sourceTree = "<group>"; };
 		607AFC2D1E923E17007518AD /* CancelButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CancelButton.swift; path = View/Camera/CancelButton.swift; sourceTree = "<group>"; };
 		609DE2271E86CA470094AA5E /* Images.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Images.swift; path = Resources/Images.swift; sourceTree = "<group>"; };
 		60B38A5A1E53845F001C167D /* WatchStream.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WatchStream.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -67,6 +66,7 @@
 		60B38A7D1E53845F001C167D /* WatchStreamUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchStreamUITests.swift; sourceTree = "<group>"; };
 		60B38A7F1E53845F001C167D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		60EAC4C21E8160A30058AAC2 /* CameraViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CameraViewController.swift; path = Controller/CameraViewController.swift; sourceTree = "<group>"; };
+		60FBBC131EAE336900C67DBB /* H264EncoderDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = H264EncoderDelegate.swift; path = Coder/H264EncoderDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,7 +137,7 @@
 			isa = PBXGroup;
 			children = (
 				606A75631E7D0254007E2874 /* H264Encoder.swift */,
-				606A75651E7D0265007E2874 /* H264Decoder.swift */,
+				60FBBC131EAE336900C67DBB /* H264EncoderDelegate.swift */,
 			);
 			name = Coder;
 			sourceTree = "<group>";
@@ -367,7 +367,7 @@
 				606A75641E7D0254007E2874 /* H264Encoder.swift in Sources */,
 				6041CFC81E7BB3E3002B5721 /* Result.swift in Sources */,
 				60EAC4C31E8160A30058AAC2 /* CameraViewController.swift in Sources */,
-				606A75661E7D0265007E2874 /* H264Decoder.swift in Sources */,
+				60FBBC141EAE336900C67DBB /* H264EncoderDelegate.swift in Sources */,
 				60B38A5E1E53845F001C167D /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

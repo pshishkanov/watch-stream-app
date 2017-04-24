@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import AVFoundation
+import VideoToolbox
 
 class CameraViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     
@@ -16,25 +17,37 @@ class CameraViewController: UIViewController, AVCaptureVideoDataOutputSampleBuff
     @IBOutlet weak var cancelButton: CancelButton!
     @IBOutlet weak var previewView: PreviewView!
     
+    @IBOutlet weak var streamView: UIView!
+    private let streamLayer = AVSampleBufferDisplayLayer()
+    
     private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
     
     private let dataOutput = AVCaptureVideoDataOutput()
-    private let queue = DispatchQueue(label: "com.invasivecode.videoQueue")
+    private let queue = DispatchQueue(label: "com.invasivecode.videoQueue")    
     
     // MARK: Capture
     private let session = AVCaptureSession()
+    
+    private var h264Encoder: H264Encoder?
     
     private var defaultVideoDevice: AVCaptureDevice = {
         let devices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo) as! [AVCaptureDevice]
         return devices[0]
     }()
     
-    
     override open func viewDidLoad() {
         super.viewDidLoad()
         setupBlurView()
         setupObservers()
         configureSession()
+        
+        streamLayer.frame = streamView.bounds
+        streamLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+        streamLayer.removeFromSuperlayer()
+        streamView.layer.addSublayer(streamLayer)
+        
+        h264Encoder = H264Encoder()
+        h264Encoder?.delegate = self
     }
     
     private func setupBlurView() {
@@ -69,11 +82,13 @@ class CameraViewController: UIViewController, AVCaptureVideoDataOutputSampleBuff
                 session.addInput(videoDeviceInput)
                 previewView.previewLayer.connection.videoOrientation = .portrait
             }
-            dataOutput.videoSettings = [(kCVPixelBufferPixelFormatTypeKey as NSString) : NSNumber(value: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange as UInt32)]
+            dataOutput.videoSettings = [(kCVPixelBufferPixelFormatTypeKey as NSString) : NSNumber(value: kCVPixelFormatType_32BGRA as UInt32)]
             dataOutput.alwaysDiscardsLateVideoFrames = true
             if session.canAddOutput(dataOutput) {
                 session.addOutput(dataOutput)
             }
+            dataOutput.connection(withMediaType: AVMediaTypeVideo).videoOrientation = .portrait
+            
         } catch {
             print("Could not add video device input to the session: \(error.localizedDescription)")
             session.commitConfiguration()
@@ -101,9 +116,36 @@ class CameraViewController: UIViewController, AVCaptureVideoDataOutputSampleBuff
     
     // TODO: Remove from this class
     func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
+        h264Encoder?.encode(uncompressedSampleBuffer: sampleBuffer)
+        if streamLayer.isReadyForMoreMediaData {
+            streamLayer.enqueue(sampleBuffer)
+        }
     }
     
     // TODO: Remove from this class
     func captureOutput(_ captureOutput: AVCaptureOutput!, didDrop sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
+    }
+    
+    private func handleEncodedSampleBuffer(sampleBuffer: CMSampleBuffer) {
+//        print("handleEncodedSampleBuffer ...")
+        
+        let description = CMSampleBufferGetFormatDescription(sampleBuffer)
+        
+        var sps: UnsafeMutablePointer<UnsafePointer<UInt8>?> = UnsafeMutablePointer<UnsafePointer<UInt8>?>.allocate(capacity: 1)
+        var spsLength: UnsafeMutablePointer<Int> = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        var spsCount: UnsafeMutablePointer<Int> = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        var spsSize: UnsafeMutablePointer<Int32> = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
+        
+        
+        var statusCode = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(description!, 0, sps, spsLength, spsCount, spsSize)
+        print(statusCode)
+        print(spsLength.pointee)
+    }
+    
+    
+}
+extension CameraViewController: H264EncoderDelegate {
+    func didFinishEncode(sampleBuffer: CMSampleBuffer) {
+        print("Successful encode frame.")
     }
 }
