@@ -1,1 +1,2 @@
 github "SwiftyBeaver/SwiftyBeaver"
+github "robbiehanson/CocoaAsyncSocket" "master"

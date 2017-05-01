@@ -10,91 +10,69 @@ import Foundation
 import UIKit
 import AVFoundation
 import VideoToolbox
+import CocoaAsyncSocket
 
-class CameraViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
+class CameraViewController: UIViewController, GCDAsyncUdpSocketDelegate {
     
+    var _socket: GCDAsyncUdpSocket?
+    var socket: GCDAsyncUdpSocket? {
+        get {
+            if _socket == nil {
+                let sock = GCDAsyncUdpSocket(delegate: self, delegateQueue: DispatchQueue.global(qos: .utility))
+                do {
+                    try sock.bind(toPort: 0)
+                } catch let err as NSError {
+                    log.error(">>> Error while initializing socket: \(err.localizedDescription)")
+                    sock.close()
+                    return nil
+                }
+                _socket = sock
+            }
+            return _socket
+        }
+        set {
+            _socket?.close()
+            _socket = newValue
+        }
+    }
+    
+    deinit {
+        socket = nil
+    }
+    
+    // MARK: Interface properties
+    private var blurView: UIVisualEffectView!
+    @IBOutlet weak var previewView: PreviewView!
     @IBOutlet weak var cameraButton: CameraButton!
     @IBOutlet weak var cancelButton: CancelButton!
-    @IBOutlet weak var previewView: PreviewView!
     
-    @IBOutlet weak var streamView: UIView!
-    private let streamLayer = AVSampleBufferDisplayLayer()
-    
-    private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-    
-    private let dataOutput = AVCaptureVideoDataOutput()
-    private let queue = DispatchQueue(label: "com.invasivecode.videoQueue")    
-    
-    // MARK: Capture
+    // MARK: Video session properties
     private let session = AVCaptureSession()
     
-    private var h264Encoder: H264Encoder?
+    // MARK: Video output properties
+    private var videoOutput = AVCaptureVideoDataOutput()
+    private let videoOutputQueue = DispatchQueue(label: "org.pshishkanov.videoOutputQueue")
     
-    private var defaultVideoDevice: AVCaptureDevice = {
+    // MARK: Coder properties
+    fileprivate var videoEncoder: VideoEncoder?
+    fileprivate var videoDecoder: VideoDecoder?
+    
+    // MARK: Camera devices
+    private var defaultCamera: AVCaptureDevice = {
         let devices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo) as! [AVCaptureDevice]
         return devices[0]
     }()
     
+    // MARK: UIViewController methods
     override open func viewDidLoad() {
         super.viewDidLoad()
-        setupBlurView()
+        setupVideoSession()
+        setupBlur()
+        setupPreview()
         setupObservers()
-        configureSession()
         
-        streamLayer.frame = streamView.bounds
-        streamLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
-        streamLayer.removeFromSuperlayer()
-        streamView.layer.addSublayer(streamLayer)
-        
-        h264Encoder = H264Encoder()
-        h264Encoder?.delegate = self
-    }
-    
-    private func setupBlurView() {
-        blurView.frame = previewView.bounds
-        blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        self.previewView.addSubview(blurView)
-    }
-    
-    func setupObservers() {
-        cameraButton.addOnTurnOnObserver {
-            self.dataOutput.setSampleBufferDelegate(self, queue: self.queue)
-            self.cancelButton.isHidden = true
-        }
-        cameraButton.addOnTurnOffObserver {
-            self.dataOutput.setSampleBufferDelegate(nil, queue: self.queue)
-            self.cancelButton.isHidden = false
-        }
-        cancelButton.addOnTapObserver {
-            self.dismiss(animated: true, completion: nil)
-        }
-    }
-    
-    func configureSession() {
-        previewView.session = session
-        previewView.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
-        
-        session.beginConfiguration()
-        session.sessionPreset = AVCaptureSessionPresetHigh
-        do {
-            let videoDeviceInput = try AVCaptureDeviceInput(device: defaultVideoDevice)
-            if (session.canAddInput(videoDeviceInput)) {
-                session.addInput(videoDeviceInput)
-                previewView.previewLayer.connection.videoOrientation = .portrait
-            }
-            dataOutput.videoSettings = [(kCVPixelBufferPixelFormatTypeKey as NSString) : NSNumber(value: kCVPixelFormatType_32BGRA as UInt32)]
-            dataOutput.alwaysDiscardsLateVideoFrames = true
-            if session.canAddOutput(dataOutput) {
-                session.addOutput(dataOutput)
-            }
-            dataOutput.connection(withMediaType: AVMediaTypeVideo).videoOrientation = .portrait
-            
-        } catch {
-            print("Could not add video device input to the session: \(error.localizedDescription)")
-            session.commitConfiguration()
-            return
-        }
-        session.commitConfiguration()
+        videoEncoder = VideoEncoder()
+        videoEncoder?.delegate = self
         
     }
     
@@ -109,43 +87,83 @@ class CameraViewController: UIViewController, AVCaptureVideoDataOutputSampleBuff
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         if session.isRunning {
             session.stopRunning()
         }
     }
     
-    // TODO: Remove from this class
-    func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
-        h264Encoder?.encode(uncompressedSampleBuffer: sampleBuffer)
-        if streamLayer.isReadyForMoreMediaData {
-            streamLayer.enqueue(sampleBuffer)
+    // MARK: Private methods
+    private func setupVideoSession() {
+        session.beginConfiguration()
+        session.sessionPreset = AVCaptureSessionPresetMedium
+        
+        do {
+            let videoInput = try AVCaptureDeviceInput(device: defaultCamera)
+            if (session.canAddInput(videoInput)) {
+                session.addInput(videoInput)
+            }
+        } catch {
+            log.warning("Error during add videoDeviceInput to session: \(error.localizedDescription)")
+            session.commitConfiguration()
+            return
         }
+        
+        videoOutput.alwaysDiscardsLateVideoFrames = true
+        videoOutput.videoSettings = [(kCVPixelBufferPixelFormatTypeKey as NSString) :
+            NSNumber(value: kCVPixelFormatType_32BGRA as UInt32)]
+        if session.canAddOutput(videoOutput) {
+            session.addOutput(videoOutput)
+            /* Setup connection orientation only after add output to session. Else connection is nil. */
+            videoOutput.connection(withMediaType: AVMediaTypeVideo).videoOrientation = .portrait
+        }
+
+        
+        session.commitConfiguration()
     }
     
-    // TODO: Remove from this class
-    func captureOutput(_ captureOutput: AVCaptureOutput!, didDrop sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
+    private func setupBlur() {
+        blurView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        blurView.frame = previewView.bounds
+        blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     }
     
-    private func handleEncodedSampleBuffer(sampleBuffer: CMSampleBuffer) {
-//        print("handleEncodedSampleBuffer ...")
-        
-        let description = CMSampleBufferGetFormatDescription(sampleBuffer)
-        
-        var sps: UnsafeMutablePointer<UnsafePointer<UInt8>?> = UnsafeMutablePointer<UnsafePointer<UInt8>?>.allocate(capacity: 1)
-        var spsLength: UnsafeMutablePointer<Int> = UnsafeMutablePointer<Int>.allocate(capacity: 1)
-        var spsCount: UnsafeMutablePointer<Int> = UnsafeMutablePointer<Int>.allocate(capacity: 1)
-        var spsSize: UnsafeMutablePointer<Int32> = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
-        
-        
-        var statusCode = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(description!, 0, sps, spsLength, spsCount, spsSize)
-        print(statusCode)
-        print(spsLength.pointee)
+    private func setupPreview() {
+        previewView.session = session
+        previewView.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+        if previewView.previewLayer.connection != nil {
+            previewView.previewLayer.connection.videoOrientation = .portrait
+        }
+        previewView.addSubview(blurView)
     }
+
+    func setupObservers() {
+        cameraButton.addOnTurnOnObserver {
+            self.videoOutput.setSampleBufferDelegate(self, queue: self.videoOutputQueue)
+            self.cancelButton.isHidden = true
+        }
+        cameraButton.addOnTurnOffObserver {
+            self.videoOutput.setSampleBufferDelegate(nil, queue: self.videoOutputQueue)
+            self.cancelButton.isHidden = false
+        }
+        cancelButton.addOnTapObserver {
+            self.dismiss(animated: true, completion: nil)
+        }
+    }    
+}
+
+// MARK: AVCaptureVideoDataOutputSampleBufferDelegate
+extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
     
+    func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
+        videoEncoder?.encode(sampleBuffer)
+    }
     
 }
-extension CameraViewController: H264EncoderDelegate {
-    func didFinishEncode(sampleBuffer: CMSampleBuffer) {
-        print("Successful encode frame.")
+
+extension CameraViewController: VideoEncoderDelegate {
+    func didFinishEncode(_ nalu: NALU) {
+        let data = Data(buffer: nalu.data!)
+        socket?.send(data, toHost: "192.168.1.240", port: 55555, withTimeout: -1, tag: 0)
     }
 }
