@@ -37,11 +37,11 @@ class StreamViewController: UIViewController, GCDAsyncUdpSocketDelegate {
     
     private func getNewSocket() -> GCDAsyncUdpSocket? {
         let port = UInt16(55555)
-        let sock = GCDAsyncUdpSocket(delegate: self, delegateQueue: udpQueue)
+        let sock = GCDAsyncUdpSocket(delegate: self, delegateQueue: DispatchQueue.global(qos: .utility))
         do {
             try sock.bind(toPort: port)
         } catch {
-            log.error(">>>Issue with setting up listener")
+            log.error(">>>Issue with setting up listener: \(error)")
             return nil
         }
         return sock
@@ -68,7 +68,7 @@ class StreamViewController: UIViewController, GCDAsyncUdpSocketDelegate {
         log.info(">> Server started")
         
         streamLayer.frame = streamView.bounds
-        streamLayer.videoGravity = AVLayerVideoGravityResizeAspect
+        streamLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
         streamLayer.removeFromSuperlayer()
         streamView.layer.addSublayer(streamLayer)
         
@@ -80,19 +80,13 @@ class StreamViewController: UIViewController, GCDAsyncUdpSocketDelegate {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if socket != nil {
-            socket?.pauseReceiving()
+            socket?.close()
             log.info(">> Server stopped")
         }
     }
     
     func udpSocket(_ sock: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext filterContext: Any?) {
-        let ptr: UnsafeBufferPointer<UInt8> = data.withUnsafeBytes {
-            UnsafeBufferPointer(start: $0, count: data.count)
-        }
-        let nalu = NALU(ptr)
-        if nalu.type == .pps || nalu.type == .sps {
-            log.info("Recive data \(nalu.type): \(data.debugDescription)")
-        }
+        let nalu = NALU(data.withUnsafeBytes { UnsafeBufferPointer(start: $0, count: data.count) })
         videoDecoder?.decode(nalu)
     }
     

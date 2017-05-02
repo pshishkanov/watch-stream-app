@@ -13,6 +13,7 @@
 		602CB1A21E902B4A0065314D /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602CB19F1E902B4A0065314D /* PreviewView.swift */; };
 		6050DC3F1EB3669C0039BD94 /* VideoEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6050DC3E1EB3669C0039BD94 /* VideoEncoder.swift */; };
 		6050DC411EB370C60039BD94 /* VideoDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6050DC401EB370C60039BD94 /* VideoDecoder.swift */; };
+		607429111EB7B267004EE8D3 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 607429101EB7B267004EE8D3 /* Settings.bundle */; };
 		607AFC2E1E923E17007518AD /* CancelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607AFC2D1E923E17007518AD /* CancelButton.swift */; };
 		609DE2281E86CA470094AA5E /* Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = 609DE2271E86CA470094AA5E /* Images.swift */; };
 		60B38A5E1E53845F001C167D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B38A5D1E53845F001C167D /* AppDelegate.swift */; };
@@ -51,6 +52,7 @@
 		602CB19F1E902B4A0065314D /* PreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PreviewView.swift; path = View/Camera/PreviewView.swift; sourceTree = "<group>"; };
 		6050DC3E1EB3669C0039BD94 /* VideoEncoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VideoEncoder.swift; path = Coder/VideoEncoder.swift; sourceTree = "<group>"; };
 		6050DC401EB370C60039BD94 /* VideoDecoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoDecoder.swift; sourceTree = "<group>"; };
+		607429101EB7B267004EE8D3 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		607AFC2D1E923E17007518AD /* CancelButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CancelButton.swift; path = View/Camera/CancelButton.swift; sourceTree = "<group>"; };
 		609DE2271E86CA470094AA5E /* Images.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Images.swift; path = Resources/Images.swift; sourceTree = "<group>"; };
 		60B38A5A1E53845F001C167D /* WatchStream.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WatchStream.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -144,6 +146,7 @@
 		60B38A511E53845E001C167D = {
 			isa = PBXGroup;
 			children = (
+				607429101EB7B267004EE8D3 /* Settings.bundle */,
 				60FBBC1A1EAE710E00C67DBB /* Cartfile */,
 				60B38A5C1E53845F001C167D /* WatchStream */,
 				60B38A711E53845F001C167D /* WatchStreamTests */,
@@ -346,6 +349,7 @@
 			files = (
 				60B38A681E53845F001C167D /* LaunchScreen.storyboard in Resources */,
 				60B38A631E53845F001C167D /* WatchStream.storyboard in Resources */,
+				607429111EB7B267004EE8D3 /* Settings.bundle in Resources */,
 				60FBBC1B1EAE710E00C67DBB /* Cartfile in Resources */,
 				600C59611E842E9100DE3197 /* Images.xcassets in Resources */,
 			);

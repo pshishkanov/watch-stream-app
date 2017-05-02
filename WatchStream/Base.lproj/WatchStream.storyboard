@@ -124,10 +124,14 @@
                         <viewControllerLayoutGuide type="top" id="sJf-bT-qc4"/>
                         <viewControllerLayoutGuide type="bottom" id="QYp-pS-ILV"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="tBP-VV-d9W" userLabel="Stream View">
+                    <view key="view" contentMode="scaleToFill" id="tBP-VV-d9W" userLabel="Player View">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="t6A-YQ-5Vs" userLabel="Stream View">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
                             <view alpha="0.40000000596046448" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ABa-gY-BWl" userLabel="Bottom View">
                                 <rect key="frame" x="0.0" y="380" width="320" height="100"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -147,14 +151,18 @@
                         <constraints>
                             <constraint firstItem="ABa-gY-BWl" firstAttribute="centerY" secondItem="U9Y-Wx-gAx" secondAttribute="centerY" id="3jU-YS-D3r"/>
                             <constraint firstItem="ABa-gY-BWl" firstAttribute="bottom" secondItem="QYp-pS-ILV" secondAttribute="top" id="8NV-6I-T0e"/>
+                            <constraint firstItem="t6A-YQ-5Vs" firstAttribute="top" secondItem="tBP-VV-d9W" secondAttribute="top" id="BF3-Yv-iDc"/>
+                            <constraint firstAttribute="trailing" secondItem="t6A-YQ-5Vs" secondAttribute="trailing" id="KYm-NS-o7o"/>
+                            <constraint firstAttribute="bottom" secondItem="t6A-YQ-5Vs" secondAttribute="bottom" id="TZj-HY-h8P"/>
                             <constraint firstItem="ABa-gY-BWl" firstAttribute="leading" secondItem="tBP-VV-d9W" secondAttribute="leading" id="YlO-bq-lkr"/>
                             <constraint firstAttribute="trailing" secondItem="ABa-gY-BWl" secondAttribute="trailing" id="bMZ-d1-drh"/>
+                            <constraint firstItem="t6A-YQ-5Vs" firstAttribute="leading" secondItem="tBP-VV-d9W" secondAttribute="leading" id="rMU-LT-9TT"/>
                             <constraint firstAttribute="trailingMargin" secondItem="U9Y-Wx-gAx" secondAttribute="trailing" constant="15" id="tea-sb-Tak"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="cancelButton" destination="U9Y-Wx-gAx" id="Rd1-0A-Qf3"/>
-                        <outlet property="streamView" destination="tBP-VV-d9W" id="c3k-8a-1Fw"/>
+                        <outlet property="streamView" destination="t6A-YQ-5Vs" id="aTS-ax-2re"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5ST-1b-6fD" userLabel="First Responder" sceneMemberID="firstResponder"/>

@@ -164,6 +164,10 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
 extension CameraViewController: VideoEncoderDelegate {
     func didFinishEncode(_ nalu: NALU) {
         let data = Data(buffer: nalu.data!)
-        socket?.send(data, toHost: "192.168.1.240", port: 55555, withTimeout: -1, tag: 0)
+
+        let ud = UserDefaults.standard
+        ud.synchronize()
+        let clientIP = ud.string(forKey: "client_ip_preference")
+        socket?.send(data, toHost: clientIP!, port: 55555, withTimeout: -1, tag: 0)
     }
 }

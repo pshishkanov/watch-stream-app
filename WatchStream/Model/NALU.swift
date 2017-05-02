@@ -1,5 +1,5 @@
 //
-//  NALUnit.swift
+//  NALU.swift
 //  WatchStream
 //
 //  Created by Pavel Shishkanov on 25/04/2017.
@@ -46,15 +46,16 @@ struct NALU {
         guard buffer.count > 0 else {
             return
         }
-        if ((buffer[0] >> 7) & 0b000_00001 == 0) {
-            refIdc = (buffer[0] >> 5) & 0b000_00011
-            type =  NALType(rawValue: (buffer[0] >> 0) & 0b0001_1111) ?? .unspec
-            data = buffer
+        guard (buffer[0] >> 7) & 0b000_00001 == 0 else {
+            return
         }
+        refIdc = (buffer[0] >> 5) & 0b000_00011
+        type =  NALType(rawValue: (buffer[0] >> 0) & 0b0001_1111) ?? .unspec
+        data = buffer
     }
     
     public func equals(_ nalu: NALU) -> Bool {
-        if nalu.data?.count != data?.count {
+        guard data != nil, nalu.data != nil, nalu.data?.count != data?.count else {
             return false
         }
         return memcmp(nalu.data!.baseAddress, data!.baseAddress, data!.count) == 0
